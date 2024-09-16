@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Route Optimization Dashboard</title>
+</head>
+<body>
+    <h1>Route Optimization</h1>
+    
+    <form id="optimizeForm">
+        <label>Cost per Route (comma-separated):</label><br>
+        <input type="text" id="cost_per_route" required><br><br>
+        
+        <label>Time per Route (comma-separated):</label><br>
+        <input type="text" id="time_per_route" required><br><br>
+        
+        <label>Max Allowed Time:</label><br>
+        <input type="number" id="max_time" required><br><br>
+        
+        <button type="submit">Optimize</button>
+    </form>
+
+    <h2>Results</h2>
+    <div id="results"></div>
+
+    <script>
+        document.getElementById('optimizeForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const cost_per_route = document.getElementById('cost_per_route').value.split(',').map(Number);
+            const time_per_route = document.getElementById('time_per_route').value.split(',').map(Number);
+            const max_time = parseFloat(document.getElementById('max_time').value);
+
+            fetch('/optimize', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cost_per_route, time_per_route, max_time })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('results').innerHTML = `
+                    <p>Optimal Route Assignment: ${data.optimal_route_assignment}</p>
+                    <p>Optimized Cost: ${data.optimized_cost}</p>
+                    <p>Total Time Used: ${data.total_time}</p>
+                `;
+            });
+        });
+    </script>
+</body>
+</html>
